@@ -122,7 +122,7 @@ fun GameScreen(navController: NavController) {
             },
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .size(70.dp)
+                .size(60.dp)
                 .padding(16.dp)
         ) {
             Icon(imageVector = Icons.Default.Person, contentDescription = "Read Privacy Policy") // Use the appropriate icon
