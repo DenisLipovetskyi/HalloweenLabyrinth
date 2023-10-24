@@ -1,43 +1,55 @@
 package com.example.halloweenlabyrinth.composable
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.halloweenlabyrinth.composable.gamelogiccomposable.GameTile
+import com.example.halloweenlabyrinth.composable.gamelogiccomposable.GameViewModel
 import com.example.halloweenlabyrinth.logic.LabyrinthGameLogic
+import androidx.compose.foundation.layout.*
+
 
 @Composable
 fun LabyrinthGame() {
-    val gameLogic = remember { LabyrinthGameLogic() } // Initialize game logic
+    val gameLogic = remember { LabyrinthGameLogic.getInstance() }  // Use getInstance to get the singleton object
+    val gameState = remember { mutableStateOf(gameLogic.getBoard()) }
 
+    // Layout to represent the game board
     Column(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Use the gameLogic to fetch the game state and render it
-        Text(text = "Welcome to the Labyrinth Game!")
-
-        // For now, just a basic demonstration:
-        for (row in gameLogic.board) {
-            Row {
-                for (tile in row) {
-                    // Display each tile. You can use simple Box composable for now.
-                    Box(modifier = Modifier.size(40.dp).border(1.dp, Color.Black)) {
-                        // Here you'll add more UI details based on the tile's attributes
+        gameState.value.forEachIndexed { rowIndex, row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                row.forEachIndexed { colIndex, tile ->
+                    GameTile(rowIndex, colIndex, tile) { r, c ->
+                        // Handle the tile click here
+                        // For instance, if a player moves to this tile, update its state and refresh the UI
+                        onTileClick(r, c, gameState, gameLogic)
                     }
                 }
             }
         }
     }
 }
+
+fun onTileClick(row: Int, col: Int, gameState: MutableState<Array<Array<LabyrinthGameLogic.Tile>>>, gameLogic: LabyrinthGameLogic) {
+    // Implement your game logic here when a tile is clicked
+    // For instance, move a player to the new tile, collect treasure, etc.
+
+    // After making changes to the game state, refresh the UI by updating the gameState
+    gameState.value = gameLogic.getBoard()
+}
+
+
