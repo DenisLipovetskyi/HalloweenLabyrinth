@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.halloweenlabyrinth.composable.LabyrinthGame
 import com.example.halloweenlabyrinth.composable.WebViewScreen
 
 @Composable
@@ -90,30 +91,21 @@ fun AppNavigator() {
         composable("game_screen_route") {
             GameScreen(navController = navController)
         }
-    }
-
-    NavHost(navController = navController, startDestination = /* ... */ ) {
-        composable("privacy_policy_route") {
-            PrivacyPolicyScreen(navController = navController)
-        }
-        composable("game_screen_route") {
-            GameScreen(navController = navController)
-        }
-        composable("webview_route/{link}") { backStackEntry ->
+        composable("WebView_route/{link}") { backStackEntry ->
             val link = backStackEntry.arguments?.getString("link") ?: ""
             WebViewScreen(url = link)
         }
         composable("labyrinth_game_route") {
-            // Here, launch your Labyrinth game from the `com.example.halloweenlabyrinth` package
-            // Example:
-            // LabyrinthGame()   // Assuming you have a composable named LabyrinthGame in your game package.
+            LabyrinthGame()
         }
     }
 }
 
 @Composable
 fun GameScreen(navController: NavController) {
-
+    val context = LocalContext.current
+    val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
+    val isPolicyAccepted = sharedPreferences.getBoolean("policy_accepted", false)
 
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -159,4 +151,9 @@ fun GameScreen(navController: NavController) {
             Icon(imageVector = Icons.Default.Info, contentDescription = "Read Privacy Policy") // Use the appropriate icon
         }
     }
+}
+fun fetchServerResponse(): String {
+    // For this example, we return a dummy URL.
+    // Later, replace this with your actual API call to fetch the response.
+    return "http://example.com"
 }
