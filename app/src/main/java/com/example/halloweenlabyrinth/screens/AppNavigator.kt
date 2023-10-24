@@ -3,11 +3,13 @@ package com.example.halloweenlabyrinth.screens
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.halloweenlabyrinth.composable.LabyrinthGame
 import com.example.halloweenlabyrinth.composable.WebViewScreen
+import com.example.halloweenlabyrinth.composable.gamelogiccomposable.GameViewModel
 
 
 @Composable
@@ -29,7 +31,8 @@ fun AppNavigator() {
             WebViewScreen(url = link)
         }
         composable("labyrinth_game_route") {
-            LabyrinthGame()
+            val viewModel: GameViewModel = viewModel()  // Get the ViewModel instance
+            LabyrinthGame(viewModel = viewModel)  // Pass the ViewModel to the composable
         }
     }
 }

@@ -4,41 +4,41 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.halloweenlabyrinth.logic.LabyrinthGameLogic
-import com.example.halloweenlabyrinth.model.Tile
-
 
 class GameViewModel : ViewModel() {
-    private val _gameState = MutableLiveData<Array<Array<Tile>>>()
-    val gameState: LiveData<Array<Array<Tile>>> = _gameState
 
-    private val _players = MutableLiveData<List<LabyrinthGameLogic.Player>>()
-    val players: LiveData<List<LabyrinthGameLogic.Player>> = _players
+    val gameLogic = LabyrinthGameLogic.getInstance()  // Make this public so that onTileClick can access
 
-    init {
-        _gameState.value = LabyrinthGameLogic.getInstance().getBoard().map { row ->
-            row.map { tile ->
-                convertToModelTile(tile)
-            }.toTypedArray()
-        }.toTypedArray()
+    private val _gameState = MutableLiveData(gameLogic.getBoard())
+    val gameState: LiveData<Array<Array<LabyrinthGameLogic.Tile>>> get() = _gameState
 
-        _players.value = LabyrinthGameLogic.getInstance().getPlayers()
-    }
+    private val _currentPlayer = MutableLiveData(gameLogic.getCurrentPlayer())
+    val currentPlayer: LiveData<LabyrinthGameLogic.Player> get() = _currentPlayer
 
-    fun updateGameState() {
-        _gameState.value = LabyrinthGameLogic.getInstance().getBoard().map { row ->
-            row.map { tile ->
-                convertToModelTile(tile)
-            }.toTypedArray()
-        }.toTypedArray()
-    }
-
-    private fun convertToModelTile(logicTile: LabyrinthGameLogic.Tile): Tile {
-        return Tile(
-            logicTile.type,
-            logicTile.treasure,
-            logicTile.player
+    private val _currentTreasure = MutableLiveData(_currentPlayer.value?.let {
+        gameLogic.getCurrentTreasure(
+            it
         )
+    })
+    val currentTreasure: LiveData<String?> get() = _currentTreasure
+
+    // Add this method to handle updating the tile's treasure in the game state
+    fun updateTileTreasure(row: Int, col: Int, treasure: String?) {
+        gameLogic.setTreasureAtPosition(Pair(row, col), treasure)
+        _gameState.value = gameLogic.getBoard()
     }
 
-    // Other functions to handle game logic
+    // This method triggers the toast for invalid move
+    fun showInvalidMove() {
+        _showInvalidMoveToast.value = Event(Unit)
+    }
+
+    // This method updates the game state LiveData
+    fun updateGameState(board: Array<Array<LabyrinthGameLogic.Tile>>) {
+        _gameState.value = board
+    }
+
+    private val _showInvalidMoveToast = MutableLiveData<Event<Unit>>()
+    val showInvalidMoveToast: LiveData<Event<Unit>> get() = _showInvalidMoveToast
+
 }

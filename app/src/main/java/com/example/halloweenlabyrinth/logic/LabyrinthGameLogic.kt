@@ -1,7 +1,19 @@
 package com.example.halloweenlabyrinth.logic
+
+import androidx.compose.runtime.MutableState
+import kotlin.math.max
+import kotlin.math.min
+
+
 class LabyrinthGameLogic private constructor() {
+
     data class Tile(val type: String, var treasure: String?, var player: Player?)
     data class Player(val id: Int, val name: String)
+
+    var extraTile: Tile = Tile("path", null, null)
+    var currentPlayerIndex: Int = 0
+    var lastPushedOutPosition: Pair<Int, Int>? = null
+    var currentTreasures: MutableList<String> = mutableListOf("Gold", "Silver")
 
     private var board: Array<Array<Tile>> = arrayOf()
     private val players = mutableListOf<Player>()
@@ -40,4 +52,106 @@ class LabyrinthGameLogic private constructor() {
             return instance!!
         }
     }
+    enum class Direction {
+        TOP, BOTTOM, LEFT, RIGHT
+    }
+
+    fun insertTile(direction: Direction, position: Int) {
+        when(direction) {
+            Direction.TOP -> {
+                for (i in 4 downTo 1) {
+                    board[i][position] = board[i-1][position]
+                }
+                board[0][position] = extraTile
+            }
+            Direction.BOTTOM -> {
+                for (i in 0 until 4) {
+                    board[4-i][position] = board[3-i][position]
+                }
+                board[0][position] = extraTile
+            }
+            Direction.LEFT -> {
+                for (i in 4 downTo 1) {
+                    board[position][i] = board[position][i-1]
+                }
+                board[position][0] = extraTile
+            }
+            Direction.RIGHT -> {
+                for (i in 0 until 4) {
+                    board[position][4-i] = board[position][3-i]
+                }
+                board[position][0] = extraTile
+            }
+        }
+        // Remember to update the `lastPushedOutPosition`
+    }
+
+    fun canMove(from: Pair<Int, Int>, to: Pair<Int, Int>): Boolean {
+        if (from.first == to.first) {
+            for (i in min(from.second, to.second)..max(from.second, to.second)) {
+                if (board[from.first][i].type != "path") return false
+            }
+            return true
+        } else if (from.second == to.second) {
+            for (i in min(from.first, to.first)..max(from.first, to.first)) {
+                if (board[i][from.second].type != "path") return false
+            }
+            return true
+        }
+        return false
+    }
+
+    fun movePlayer(player: Player, to: Pair<Int, Int>) {
+        val currentPosition = findPlayerPosition(player)
+        if (canMove(currentPosition, to)) {
+            board[currentPosition.first][currentPosition.second].player = null
+            board[to.first][to.second].player = player
+        }
+    }
+
+    fun findPlayerPosition(player: Player): Pair<Int, Int> {
+        for (i in board.indices) {
+            for (j in board[i].indices) {
+                if (board[i][j].player == player) {
+                    return Pair(i, j)
+                }
+            }
+        }
+        throw IllegalArgumentException("Player not found on board")
+    }
+    fun hasFoundTreasure(player: Player): Boolean {
+        val position = findPlayerPosition(player)
+        return board[position.first][position.second].treasure == getCurrentTreasure(player)
+    }
+
+    fun switchTurn() {
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size
+    }
+
+    fun checkWinningCondition(gameLogic: LabyrinthGameLogic): Boolean {
+        // Example: Check if a player has collected all treasures and returned to their starting position.
+        val currentPlayer = gameLogic.getCurrentPlayer()
+        val playerPos = gameLogic.findPlayerPosition(currentPlayer)
+        return playerPos == Pair(0, 0) || playerPos == Pair(4, 4) // TODO: Expand this to match the actual starting positions and treasure conditions.
+    }
+
+    fun resetGame(gameLogic: LabyrinthGameLogic, gameState: MutableState<Array<Array<Tile>>>) {
+        // For now, recreate the game instance
+        LabyrinthGameLogic.instance = LabyrinthGameLogic()
+        gameState.value = gameLogic.getBoard()
+    }
+
+    fun setTreasureAtPosition(position: Pair<Int, Int>, treasure: String?) {
+        board[position.first][position.second].treasure = treasure
+    }
+
+    fun getCurrentTreasure(player: Player): String? {
+        // For simplicity, return the first treasure in the list
+        return currentTreasures.firstOrNull()
+    }
+
+    fun getCurrentPlayer(): Player {
+        return players[currentPlayerIndex]
+    }
+
 }
