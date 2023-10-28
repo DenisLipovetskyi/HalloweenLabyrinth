@@ -1,5 +1,5 @@
 package com.example.halloweenlabyrinth.model
 
-enum class TileType {
-    FIXED, MOVABLE,EMPTY
+import android.graphics.Point
+
 }
