@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.halloweenlabyrinth.logic.LabyrinthGameLogic
-import com.example.halloweenlabyrinth.model.TileType
 
 @Composable
 fun GameTile(row: Int, col: Int, tile: LabyrinthGameLogic.Tile, onClick: (Int, Int) -> Unit) {

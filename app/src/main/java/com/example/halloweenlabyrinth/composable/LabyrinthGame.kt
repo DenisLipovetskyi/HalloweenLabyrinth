@@ -3,13 +3,7 @@ package com.example.halloweenlabyrinth.composable
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,12 +14,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.halloweenlabyrinth.composable.gamelogiccomposable.GameViewModel
-import com.example.halloweenlabyrinth.logic.LabyrinthGameLogic
+import com.google.android.gms.maps.model.Tile
+import kotlin.reflect.KProperty
+
+private val Tile.player: Any
+    get() {
+        TODO("Not yet implemented")
+    }
+
+private val Tile.treasure: Any
+    get() {
+        TODO("Not yet implemented")
+    }
 
 @Composable
 fun LabyrinthGame(viewModel: GameViewModel) {
     val gameState by viewModel.gameState.observeAsState()
-    val currentPlayer by viewModel.currentPlayer.observeAsState()
+    val currentPlayer by viewModel. currentPlayer.observeAsState()
     val currentTreasure by viewModel.currentTreasure.observeAsState()
 
     Text(text = "Current Player: ${currentPlayer?.name ?: ""}")
@@ -59,10 +64,9 @@ fun LabyrinthGame(viewModel: GameViewModel) {
 }
 
 @Composable
-fun TileBox(tile: LabyrinthGameLogic.Tile, onClick: () -> Unit) {
-    val backgroundColor = when (tile.type) {
-        "wall" -> Color.DarkGray
-        "path" -> Color.LightGray
+fun TileBox(tile: Tile, onClick: () -> Unit) {
+    val backgroundColor = when (tile) {
+is Tile -> Color.Gray
         else -> Color.White
     }
 
@@ -74,10 +78,10 @@ fun TileBox(tile: LabyrinthGameLogic.Tile, onClick: () -> Unit) {
         contentAlignment = Alignment.Center
     ) {
         tile.player?.let {
-            Text(text = it.name, color = Color.Black)
+            Text(text = "ca", color = Color.Black)
         }
         tile.treasure?.let {
-            Text(text = it, color = Color.Red)
+            Text(text = "cdw", color = Color.Red)
         }
     }
 }
@@ -103,22 +107,20 @@ fun onTileClick(rowIndex: Int, colIndex: Int, viewModel: GameViewModel) {
     }
 
     viewModel.updateGameState(gameLogic.getBoard())
+}
 
-    open class Event<out T>(private val content: T) {
+open class Event<out T>(private val content: T) {
+    var hasBeenHandled = false
+        private set
 
-        var hasBeenHandled = false
-            private set
-
-        fun getContentIfNotHandled(): T? {
-            return if (hasBeenHandled) {
-                null
-            } else {
-                hasBeenHandled = true
-                content
-            }
+    fun getContentIfNotHandled(): T? {
+        return if (hasBeenHandled) {
+            null
+        } else {
+            hasBeenHandled = true
+            content
         }
-
-        fun peekContent(): T = content
     }
 
+    fun peekContent(): T = content
 }

@@ -1,9 +1,17 @@
 package com.example.halloweenlabyrinth.model
 
-import com.example.halloweenlabyrinth.logic.LabyrinthGameLogic
+import com.example.halloweenlabyrinth.composable.gamelogiccomposable.Player
+import com.example.halloweenlabyrinth.logic.TileContent
 
-data class Tile(
-    val type: String, // FIXED, MOVABLE
-    val treasure: String?, // Represents the treasure on this tile. Null if no treasure.
-    val player: LabyrinthGameLogic.Player? // Represents the player on this tile. Null if no player.
-)
+class Tile {
+    internal enum class Type {
+        FIXED, MOVABLE
+    }
+
+    lateinit var content: TileContent
+    private val tileType: Type? = null
+    var treasure: Treasure? = null
+    private val player: Player? = null // Getters and setters
+
+    // Constructor
+}
