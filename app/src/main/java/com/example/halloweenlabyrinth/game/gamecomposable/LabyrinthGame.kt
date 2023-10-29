@@ -1,28 +1,34 @@
 package com.example.halloweenlabyrinth.game.gamecomposable
 
+import androidx.compose.foundation.Image
 import com.example.halloweenlabyrinth.game.GameView
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
+import com.example.halloweenlabyrinth.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.halloweenlabyrinth.game.data.Direction
 import androidx.compose.ui.unit.times
 import com.example.halloweenlabyrinth.game.GameLogic
 import com.example.halloweenlabyrinth.game.data.*
 
 @Composable
-fun LabyrinthGame(viewModel: GameView, gameLogic: GameLogic) {  // Add gameLogic here
+fun LabyrinthGame(viewModel: GameView, gameLogic: GameLogic) {
     val gameState by viewModel.gameState
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Render Tiles
-        gameState.tiles.forEachIndexed { index, tile ->
-            TileComposable(tile, index, viewModel.gridSize)
+        Column {
+            for (row in gameState.tiles) {
+                Row {
+                    for (tile in row) {
+                        TileComposable(tile)
+                    }
+                }
+            }
         }
 
         // Render Players
@@ -31,6 +37,7 @@ fun LabyrinthGame(viewModel: GameView, gameLogic: GameLogic) {  // Add gameLogic
                 gameLogic.movePlayer(direction)
             }
         }
+
         // Render Treasures
         gameState.treasures.forEach { treasure ->
             TreasureComposable(treasure)
@@ -52,11 +59,9 @@ fun BoxWithPosition(index: Int, gridSize: Int, content: @Composable () -> Unit) 
 
 @Composable
 fun PlayerComposable(player: Player, onMove: (Direction) -> Unit) {
-    Text(
-        text = "Player",  // Just a placeholder for now
-        modifier = Modifier.clickable(onClick = {
-            onMove(Direction.UP)  // Example direction, update accordingly
-        })
+    Image(
+        painter = painterResource(id = R.drawable.icon),
+        contentDescription = "Player Icon"
     )
 }
 

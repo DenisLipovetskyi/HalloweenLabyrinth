@@ -12,3 +12,5 @@ fun Direction.moveFrom(point: Point): Point {
         Direction.RIGHT -> Point(point.x + 1, point.y)
     }
 }
+
+
