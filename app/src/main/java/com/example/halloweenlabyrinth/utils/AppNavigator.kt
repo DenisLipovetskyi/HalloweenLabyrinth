@@ -1,12 +1,13 @@
 package com.example.halloweenlabyrinth.utils
 
+import com.example.halloweenlabyrinth.game.GameView
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.*
 import com.example.halloweenlabyrinth.composable.WebViewScreen
-import com.example.halloweenlabyrinth.game.GameView
+import com.example.halloweenlabyrinth.game.GameLogic
 import com.example.halloweenlabyrinth.game.gamecomposable.LabyrinthGame
 import com.example.halloweenlabyrinth.screens.GameScreen
 import com.example.halloweenlabyrinth.screens.PrivacyPolicyScreen
@@ -17,7 +18,7 @@ fun AppNavigator() {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     val isPolicyAccepted = sharedPreferences.getBoolean("policy_accepted", false)
-    val gameViewModel = remember { GameView() } // create an instance of GameView
+    val gameViewModel = remember { GameView() } // create an instance of com.example.halloweenlabyrinth.game.GameView
 
     NavHost(navController = navController, startDestination = if (isPolicyAccepted) "game_screen_route" else "privacy_policy_route") {
 
@@ -27,7 +28,7 @@ fun AppNavigator() {
             WebViewScreen(url = backStackEntry.arguments?.getString("link") ?: "")
         }
         composable("labyrinth_game_route") {
-            LabyrinthGame(viewModel = gameViewModel)
+            LabyrinthGame(viewModel = gameViewModel, gameLogic = GameLogic(gameViewModel)  )
         }
     }
 }
