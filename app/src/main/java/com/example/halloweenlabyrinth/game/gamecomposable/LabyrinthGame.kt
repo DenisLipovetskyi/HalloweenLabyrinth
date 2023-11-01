@@ -1,76 +1,87 @@
-package com.example.halloweenlabyrinth.game.gamecomposable
-
-import androidx.compose.foundation.Image
-import com.example.halloweenlabyrinth.game.GameView
+// Imports related to Jetpack Compose UI
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
-import com.example.halloweenlabyrinth.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.dp
+import com.example.halloweenlabyrinth.game.data.GameState
 import com.example.halloweenlabyrinth.game.data.Direction
-import androidx.compose.ui.unit.times
+import androidx.compose.ui.unit.dp
+
+// Imports related to game logic and data
 import com.example.halloweenlabyrinth.game.GameLogic
 import com.example.halloweenlabyrinth.game.data.*
 
+// Game Composable UI Elements
+import com.example.halloweenlabyrinth.game.gamecomposable.*
+
 @Composable
-fun LabyrinthGame(viewModel: GameView, gameLogic: GameLogic) {
+fun LabyrinthGame(viewModel: GameViewModel, gameLogic: GameLogic) {
     val gameState by viewModel.gameState
 
+    when {
+        viewModel.isGameOver && !viewModel.hasWon -> Text("Game Over!")
+        viewModel.hasWon -> Text("You Won!")
+        else -> GameBoardUI(gameState, gameLogic)
+    }
+}
+
+@Composable
+private fun GameBoardUI(gameState: GameState, gameLogic: GameLogic) {
     Box(modifier = Modifier.fillMaxSize()) {
-        // Render Tiles
-        Column {
-            for (row in gameState.tiles) {
-                Row {
-                    for (tile in row) {
-                        TileComposable(tile)
+        DisplayTiles(gameState)
+        DisplayTreasures(gameState)
+        DisplayPlayers(gameState, gameLogic)
+    }
+}
+
+@Composable
+private fun DisplayTiles(gameState: GameState) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        gameState.tiles.forEach { row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                row.forEach { tile ->
+                    TileComposable(tile) {
+                        // TODO: Handle tile click if needed
                     }
                 }
             }
         }
+    }
+}
 
-        // Render Players
-        gameState.players.forEach { player ->
-            PlayerComposable(player) { direction ->
-                gameLogic.movePlayer(direction)
-            }
-        }
-
-        // Render Treasures
-        gameState.treasures.forEach { treasure ->
+@Composable
+private fun DisplayTreasures(gameState: GameState) {
+    gameState.treasures.forEach { treasure ->
+        Box(modifier = Modifier.offsetFromGrid(treasure.position)) {
             TreasureComposable(treasure)
         }
     }
 }
 
 @Composable
-fun BoxWithPosition(index: Int, gridSize: Int, content: @Composable () -> Unit) {
-    val tileSize = 50.dp
-    Box(
-        modifier = Modifier
-            .size(tileSize)
-            .offset(y = (index / gridSize * tileSize.value).dp, x = (index % gridSize * tileSize.value).dp)
-    ) {
-        content()
+private fun DisplayPlayers(gameState: GameState, gameLogic: GameLogic) {
+    gameState.players.forEach { player ->
+        Box(modifier = Modifier.offsetFromGrid(player.position)) {
+            PlayerComposable(player) { direction: Direction ->
+                gameLogic.movePlayer(direction)
+            }
+        }
     }
 }
 
 @Composable
-fun PlayerComposable(player: Player, onMove: (Direction) -> Unit) {
-    Image(
-        painter = painterResource(id = R.drawable.icon),
-        contentDescription = "Player Icon"
-    )
+fun PlayerComposable(player: Player, onDirectionSelected: (Direction) -> Unit) {
+    // Implementation for PlayerComposable
+    // Invoke onDirectionSelected(Direction) when required
 }
 
-fun Modifier.offsetFromGrid(point: Point): Modifier {
-    val tileSize = 50.dp
-    return this.offset(y = point.y * tileSize.value.dp, x = point.x * tileSize.value.dp)
-}
-
-@Composable
-fun FeedbackMessage(message: String) {
-    Text(text = message)
-}
+// Keep your data classes and enums as they are, they seem structured and clear.
