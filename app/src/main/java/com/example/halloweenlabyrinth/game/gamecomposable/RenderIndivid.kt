@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.times
 import com.example.halloweenlabyrinth.R
 import com.example.halloweenlabyrinth.game.data.*
 
-private const val TILE_SIZE = 50
+private const val TILE_SIZE = 90
 
 @Composable
 fun TreasureComposable(treasure: Treasure) {
@@ -61,6 +61,8 @@ fun PlayerComposable(player: Player, onMove: (Direction) -> Unit) {
 fun Modifier.offsetFromGrid(point: Point): Modifier {
     return this.offset(y = point.y * TILE_SIZE.dp, x = point.x * TILE_SIZE.dp)
 }
+
+
 
 fun Point.offsetBy(direction: Direction): Point {
     return when (direction) {

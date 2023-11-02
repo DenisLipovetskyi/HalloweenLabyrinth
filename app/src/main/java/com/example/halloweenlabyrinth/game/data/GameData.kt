@@ -17,12 +17,9 @@ data class Point(val x: Int, val y: Int)
 
 enum class TileType { FIXED, MOVABLE, TREASURE, EMPTY }
 
-data class Tile(
-    val type: TileType,
-    val position: Point,  // Added the position directly into Tile
-    val treasure: Treasure? = null, // Updated to Treasure type instead of Point for clearer representation
-    val player: Player? = null // Represents player on the tile, null if no player
-)
+data class Tile(val type: TileType, val position: Point, val rotation: Int = 0, val treasure: Treasure? = null)
+
+
 
 data class Player(
     val id: String,
